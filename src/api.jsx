@@ -1,0 +1,1 @@
+const apibase = 'http://localhost:88/school/';

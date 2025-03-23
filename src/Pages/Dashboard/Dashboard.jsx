@@ -11,7 +11,11 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../../components/Appbar/Sidebar/Sidebar';
 import { useNavigate } from 'react-router-dom';
-
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import CardActionArea from '@mui/material/CardActionArea';
 
 function Dashboard() {
 
@@ -25,10 +29,12 @@ function Dashboard() {
     return (
         <Container fluid style={{ width: '100vw', direction: 'rtl' }}>
             <Row>
-                <Col style={{ padding: 0 }} md={2} xs={2}> <Sidebar />
+                <Col style={{ padding: 0 }} md={2} xs={2}> 
+                <Sidebar />
                 </Col>
                 <Col md={10} xs={10}>
                     <Outlet />
+                    
                 </Col>
             </Row>
 

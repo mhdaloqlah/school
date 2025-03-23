@@ -2,19 +2,9 @@ import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import axios from "axios";
-import { Dialog } from "primereact/dialog";
-import Viewstudent from "./_viewStudent";
-import AddStudent from "./_addStudent";
-import EditStudent from "./_editStudent";
-import { ConfirmDialog } from "primereact/confirmdialog";
-import { confirmDialog } from "primereact/confirmdialog";
-import PropTypes from "prop-types";
-import Backdrop from "@mui/material/Backdrop";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
+
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import { useSpring, animated } from "@react-spring/web";
+
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -23,21 +13,24 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate } from 'react-router-dom';
 
-function Students() {
+function Teachers() {
   const apilink = import.meta.env.VITE_API_BASE_URL;
+  const storageLink = import.meta.env.VITE_API_STORAGE_URL;
+
   const navigate = useNavigate();
-  const Api = apilink + "student?include=grade,subclass";
-  const [students, setStudents] = useState([]);
+  const Api = apilink+"teacher";
+  const [teachers, setTeachers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const goToEditStudent = (id) => { navigate(`/dashboard/editstudent/${id}`); };
+  const goToEditTeacher = (id) => { navigate(`/dashboard/EditTeacher/${id}`); };
+  const goTRegisterTeacher = (id) => { navigate(`/dashboard/register/${id}`); };
 
-  const getStudents = () => {
+  const getTeachers = () => {
     axios
       .get(Api)
       .then((res) => {
-        setStudents(res.data.data);
+        setTeachers(res.data.data);
         console.log(res.data.data);
       })
       .catch((err) => {
@@ -46,20 +39,20 @@ function Students() {
   };
 
   useEffect(() => {
-    getStudents();
+    getTeachers();
   }, []);
 
   const handelDelete = async (id) => {
     console.log("id : -", id);
     // setIsLoading(true);
     try {
-      const response = await fetch(apilink.concat("student/") + id, {
+      const response = await fetch(apilink.concat("teacher/") + id, {
         method: "DELETE",
       });
       if (!response.ok) {
         throw new Error("Failed to delete item");
       }
-      setStudents(students.filter((item) => item.id !== id));
+      setTeachers(teachers.filter((item) => item.id !== id));
       // getYears();
     } catch (error) {
       setError(error.message);
@@ -69,48 +62,48 @@ function Students() {
   };
 
   const handleShow = (id) => {
-    navigate(`/dashboard/AdminStudentMark/${id}`);
+    getStudent(id);
   };
 
   return (
     <Container style={{ paddingRight: "50px" }}>
-      <h1 style={{ marginTop: "25px" }}>سجل الطلاب</h1>
+      <h1 style={{ marginTop: "25px" }}>سجل المدرسين</h1>
       <Row style={{ marginTop: "50px" }}>
         <Col xl={1}>
-          <a href="/dashboard/AddStudent" className="btn btn-primary" variant="contained">إضافة</a>
+          <a href="/dashboard/AddTeacher" className="btn btn-primary" variant="contained">إضافة</a>
         </Col>
       </Row>
 
       <Row>
         <div className="mt-5">
           {isLoading && <Loader />}
-
           {error && <p>Error: {error}</p>}
-
 
           <table className="table table-striped">
             <thead>
               <tr>
-                <th>رقم الطالب</th>
-                <th>اسم الطالب</th>
-                <th>الشعبة</th>
-                <th>الصف</th>
+                <th>رقم المدرس</th>
+                <th>اسم المدرس</th>
+              <th></th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {students?.map((item, i) => {
+              {teachers?.map((item, i) => {
                 return (
                   <tr key={i + 1}>
                     <td>{i + 1}</td>
-                    <td style={{ color: 'red' }}>
+                    <td>
                       {item.first_name} {item.last_name}
                     </td>
-                    <td>{item.subclass.name}</td>
-                    <td>{item.grade.name}</td>
+
+                    <td>
+                        <img src={storageLink + item.image} style={{width:'100px',height:'100px'}}/>
+                    </td>
+                  
                     <td>
                       <Button
-                        onClick={() => goToEditStudent(item.id)}
+                        onClick={() => goToEditTeacher(item.id)}
                         style={{ backgroundColor: "green" }}
                         variant="contained"
                       >
@@ -120,7 +113,7 @@ function Students() {
                       </Button>
 
                       <Button
-                        onClick={() => handleShow(item.id)}
+                         onClick={() => goTRegisterTeacher(item.id)}
                         style={{
                           backgroundColor: "orange",
                           marginRight: "10px",
@@ -130,9 +123,11 @@ function Students() {
                       >
                         {" "}
                         <VisibilityIcon style={{ cursor: "pointer" }} />
-                        درجات
+                        مواد المدرس
                       </Button>
-                      <Button
+
+                      {
+                        item.materials_count =='0'?  <Button
                         onClick={() => handelDelete(item.id)}
                         style={{ backgroundColor: "red" }}
                         variant="contained"
@@ -140,17 +135,13 @@ function Students() {
                         {" "}
                         <DeleteIcon style={{ cursor: "pointer" }} />
                         حذف
-                      </Button>
+                      </Button>:''
+                      }
+                     
                     </td>
                   </tr>
                 );
               })}
-
-              <tr>
-                <td colSpan="5" style={{ color: 'red' }}>
-                  عند حذف سجل الطالب سيتم حذف جميع درجات الطالب المدخلة
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -159,4 +150,4 @@ function Students() {
   );
 }
 
-export default Students;
+export default Teachers;

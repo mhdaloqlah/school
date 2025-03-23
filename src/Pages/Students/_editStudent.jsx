@@ -1,271 +1,454 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
+import Container from "react-bootstrap/Container";
+import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const initialUserInfo = {
-    id: '',
-    name: '',
-    username: '',
-    email: '',
-    phone: '',
-    website: '',
-    address: {
-        city: '',
-        street: '',
-        suite: '',
-        zipcode: ''
-    },
-    company: {
-        name: '',
-        catchPhrase: '',
-        bs: ''
+const initialStudentInfo = {
+  first_name: "",
+  last_name: "",
+  father: "",
+  mother: "",
+  birth_date: "",
+  birth_place: "",
+  username: "",
+  address: "",
+  phone: "",
+  image: "",
+  grade: "",
+  subclass: "",
+  year: "",
+  term: "",
+  place: "",
+};
+
+
+function EditStudent() {
+    const navigate = useNavigate();
+  
+  const apilink = import.meta.env.VITE_API_BASE_URL;
+  const storageLink = import.meta.env.VITE_API_STORAGE_URL;
+
+  const { id } = useParams();
+  const ApiStudent = apilink + 'student';
+  const [student, SetStudent] = useState([]);
+  const ApiGrades = apilink + "grade";
+  const [grades, setGrades] = useState([]);
+  const ApiSubclass = apilink + "subclass";
+  const [subclasses, setSubclasses] = useState([]);
+  const ApiYears = apilink + "year";
+  const [years, setYears] = useState([]);
+  const ApiTerms = apilink + "term";
+  const [terms, setTerms] = useState([]);
+  const [image, setImage] = useState(null);
+
+
+  const [grade, setGrade] = useState("");
+  const [gradeName, setGradeName] = useState("");
+  const [subclass, setSubclass] = useState("");
+  const [subclassname, setSubclassname] = useState("");
+  const [term, setTerm] = useState("");
+  const [termname, setTermname] = useState("");
+  const [year, setYear] = useState("");
+  const [yearname, setYearname] = useState("");
+
+  const handleGradeChange = (event) => {
+    const selectedValue = event.target.value;
+    setGrade(selectedValue);
+
+    const selectedItem = grades.find((cat) => cat.id === selectedValue);
+    if (selectedItem) {
+      setGradeName(selectedItem.name);
     }
-}
+  };
 
-function EditStudent(props) {
-    const [userInfo, setUserInfo] = useState(initialUserInfo);
+  const handleSubclassChange = (event) => {
+    const selectedValue = event.target.value;
+    setSubclass(selectedValue);
 
-    useEffect(() => {
-        setUserInfo({ ...userInfo,id: props.userId})
-        fetchUserData();
-    }, []);
-
-    const fetchUserData = async () => {
-        try {
-            const response = await axios.get('http://localhost:4000/users/' + props.userId);
-            if (response) {
-                console.log(response)
-                setUserInfo(response.data);
-            }
-            return
-        }
-        catch (e) {
-            console.log(e)
-        }
+    const selectedItem = subclasses.find((cat) => cat.id === selectedValue);
+    if (selectedItem) {
+      setSubclassname(selectedItem.name);
     }
+  };
 
-    const editExistUser = async () => {
-        try {
-            const response = await axios.put('http://localhost:4000/users/' + props.userId, userInfo);
-            if (response) {
-                props.setUserEdited();
-            }
-        }
-        catch (e) {
-            console.log(e)
-        }
+  const handleYearChange = (event) => {
+    const selectedValue = event.target.value;
+    setYear(selectedValue);
+
+    const selectedItem = years.find((cat) => cat.id === selectedValue);
+    if (selectedItem) {
+      setYearname(selectedItem.name);
     }
+  };
+
+  const handleTermChange = (event) => {
+    const selectedValue = event.target.value;
+    setTerm(selectedValue);
+
+    const selectedItem = terms.find((cat) => cat.id === selectedValue);
+    if (selectedItem) {
+      setTermname(selectedItem.name);
+    }
+  };
+
+  const getStudent = (id) => {
+    axios
+      .get(ApiStudent + "/" + id)
+      .then((res) => {
+        SetStudent(res.data.data);
+        setGrade(res.data.data.grade_id);
+        setSubclass(res.data.data.subclass_id);
+        setYear(res.data.data.register_year_id);
+        setTerm(res.data.data.register_term_id);
+        initialStudentInfo.first_name= res.data.data.first_name;
+        initialStudentInfo.last_name= res.data.data.last_name;
+        initialStudentInfo.father= res.data.data.father;
+        initialStudentInfo.mother= res.data.data.mother;
+        initialStudentInfo.place= res.data.data.address;
+        initialStudentInfo.phone= res.data.data.phone;
+        initialStudentInfo.birth_date= res.data.data.birth_date;
+        initialStudentInfo.birth_place= res.data.data.birth_place;
+        initialStudentInfo.username= res.data.data.username;
+
+        console.log(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getGrades = () => {
+    axios
+      .get(ApiGrades)
+      .then((res) => {
+        setGrades(res.data.data);
+        console.log(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getSubclasses = () => {
+    axios
+      .get(ApiSubclass)
+      .then((res) => {
+        setSubclasses(res.data.data);
+        console.log(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getYears = () => {
+    axios
+      .get(ApiYears)
+      .then((res) => {
+        setYears(res.data.data);
+        console.log(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getTerms = () => {
+    axios
+      .get(ApiTerms)
+      .then((res) => {
+        setTerms(res.data.data);
+        console.log(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
 
-    return (
-        <div className='user-view _add-view'>
-            <h1>Basic Info</h1>
-            <div className='box'>
-                <div className='row'>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>Full Name:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter Full Name'
-                                value={userInfo.name}
-                                onChange={e => setUserInfo({ ...userInfo, name: e.target.value })}
-                            />
-                        </p>
-                    </div>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>Username:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter Username'
-                                value={userInfo.username}
-                                onChange={e => setUserInfo({ ...userInfo, username: e.target.value })}
-                            />
-                        </p>
-                    </div>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>Email Address:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter Email Address'
-                                value={userInfo.email}
-                                onChange={e => setUserInfo({ ...userInfo, email: e.target.value })}
-                            />
-                        </p>
-                    </div>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>Phone Number:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter Phone Number'
-                                value={userInfo.phone}
-                                onChange={e => setUserInfo({ ...userInfo, phone: e.target.value })}
-                            />
-                        </p>
-                    </div>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>Website:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter Website'
-                                value={userInfo.website}
-                                onChange={e => setUserInfo({ ...userInfo, website: e.target.value })}
-                            />
-                        </p>
-                    </div>
+  const [studentInfo, setStudentInfo] = useState(initialStudentInfo);
+  const addNewStudent = async () => {
 
-                </div>
+    console.log(studentInfo.grade);
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("first_name", studentInfo.first_name);
+    formData.append("last_name", studentInfo.last_name);
+    formData.append("username", studentInfo.username);
+    formData.append("father", studentInfo.father);
+    formData.append("mother", studentInfo.mother);
+    formData.append("birth_date", studentInfo.birth_date);
+    formData.append("birth_place", studentInfo.birth_place);
+    formData.append("phone", studentInfo.phone);
+    if (image) {
+      formData.append("image", image);
+    }
+    formData.append("grade_id", grade);
+    formData.append("subclass_id", subclass);
+    formData.append("register_year_id", year);
+    formData.append("register_term_id", term);
+    formData.append("address", studentInfo.place);
+    try {
+
+      const response = await axios.post(
+        apilink + "updatestudent",
+        formData
+      );
+      if (response) {
+        // props.setStudentAdded();
+        console.log(response.data);
+        navigate(`/dashboard/students/`);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getGrades();
+    getSubclasses();
+    getYears();
+    getTerms();
+    getStudent(id);
+
+  }, []);
+
+
+
+  return (
+    <Container style={{ paddingRight: "50px" }}>
+      <div className="user-view _add-view">
+        <h1 style={{ marginTop: "25px" }}>المعلومات الشخصية</h1>
+        <div className="box">
+          <div className="row">
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <img src={storageLink +student.image} style={{ width: '250px', height: '250px' }} />
+              </p>
             </div>
-
-            <h1>User Address</h1>
-            <div className='box'>
-                <div className='row'>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>City:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter City Name'
-                                value={userInfo.address.city}
-                                onChange={e => setUserInfo({
-                                    ...userInfo,
-                                    address: {
-                                        ...userInfo.address,
-                                        city: e.target.value
-                                    }
-                                })}
-                            />
-                        </p>
-                    </div>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>Street:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter Street Name'
-                                value={userInfo.address.street}
-                                onChange={e => setUserInfo({
-                                    ...userInfo,
-                                    address: {
-                                        ...userInfo.address,
-                                        street: e.target.value
-                                    }
-                                })}
-                            />
-                        </p>
-                    </div>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>Suite:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter Suite Name'
-                                value={userInfo.address.suite}
-                                onChange={e => setUserInfo({
-                                    ...userInfo,
-                                    address: {
-                                        ...userInfo.address,
-                                        suite: e.target.value
-                                    }
-                                })}
-                            />
-                        </p>
-                    </div>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>ZIP Code:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter ZIP Code'
-                                value={userInfo.address.zipcode}
-                                onChange={e => setUserInfo({
-                                    ...userInfo,
-                                    address: {
-                                        ...userInfo.address,
-                                        zipcode: e.target.value
-                                    }
-                                })}
-                            />
-                        </p>
-                    </div>
-                </div>
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>الصورة الشخصية:</span>
+                <input
+                  type="file"
+                  placeholder=""
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files[0])}
+                />
+              </p>
             </div>
-
-            <h1>User Company</h1>
-            <div className='box'>
-                <div className='row'>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>Company Name:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter Company Name'
-                                value={userInfo.company.name}
-                                onChange={e => setUserInfo({
-                                    ...userInfo,
-                                    company: {
-                                        ...userInfo.company,
-                                        name: e.target.value
-                                    }
-                                })}
-                            />
-                        </p>
-                    </div>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>Catch Phrase:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter Catch Phrase'
-                                value={userInfo.company.catchPhrase}
-                                onChange={e => setUserInfo({
-                                    ...userInfo,
-                                    company: {
-                                        ...userInfo.company,
-                                        catchPhrase: e.target.value
-                                    }
-                                })}
-                            />
-                        </p>
-                    </div>
-                    <div className='col-sm-12 col-md-6'>
-                        <p>
-                            <span>BS:</span>
-                            <input
-                                type='text'
-                                className='form-control'
-                                placeholder='Enter BS'
-                                value={userInfo.company.bs}
-                                onChange={e => setUserInfo({
-                                    ...userInfo,
-                                    company: {
-                                        ...userInfo.company,
-                                        bs: e.target.value
-                                    }
-                                })}
-                            />
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <button className='btn btn-success' onClick={() => editExistUser()}>Edit User</button>
+          </div>
         </div>
-    )
+        <div className="box">
+          <div className="row">
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>الاسم الأول</span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="أدخل الاسم الأول"
+                  value={studentInfo.first_name}
+                  onChange={(e) =>
+                    setStudentInfo({
+                      ...studentInfo,
+                      first_name: e.target.value,
+                    })
+                  }
+                />
+              </p>
+            </div>
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>الكنية:</span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="أدخل الكنية"
+                  value={studentInfo.last_name}
+                  onChange={(e) =>
+                    setStudentInfo({
+                      ...studentInfo,
+                      last_name: e.target.value,
+                    })
+                  }
+                />
+              </p>
+            </div>
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>اسم الأب:</span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="اسم الاب"
+                  value={studentInfo.father}
+                  onChange={(e) =>
+                    setStudentInfo({ ...studentInfo, father: e.target.value })
+                  }
+                />
+              </p>
+            </div>
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>اسم الأم:</span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="اسم الأم"
+                  value={studentInfo.mother}
+                  onChange={(e) =>
+                    setStudentInfo({ ...studentInfo, mother: e.target.value })
+                  }
+                />
+              </p>
+            </div>
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>تاريخ الولادة:</span>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={studentInfo.birth_date}
+                  onChange={(e) =>
+                    setStudentInfo({
+                      ...studentInfo,
+                      birth_date: e.target.value,
+                    })
+                  }
+                />
+              </p>
+            </div>
+
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>مكان الولادة:</span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="مكان الولادة"
+                  value={studentInfo.birth_place}
+                  onChange={(e) =>
+                    setStudentInfo({
+                      ...studentInfo,
+                      birth_place: e.target.value,
+                    })
+                  }
+                />
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="box">
+          <div className="row">
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>العنوان:</span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="العنوان"
+                  value={studentInfo.place}
+                  onChange={(e) =>
+                    setStudentInfo({ ...studentInfo, place: e.target.value })
+                  }
+                />
+              </p>
+            </div>
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>رقم الهاتف:</span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="رقم الهاتف"
+                  value={studentInfo.phone}
+                  onChange={(e) =>
+                    setStudentInfo({ ...studentInfo, phone: e.target.value })
+                  }
+                />
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h1>المعلومات الدراسية</h1>
+        <div className="box">
+          <div className="row">
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>الصف:</span>
+
+                <select value={grade} onChange={handleGradeChange} className="form-select">
+                  {grades.map((option) => {
+                    return (
+                      <option key={option.name} value={option.id}>
+                        {option.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </p>
+            </div>
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>الشعبة:</span>
+                <select value={subclass} onChange={handleSubclassChange} className="form-select">
+                  {subclasses.map((option) => {
+                    return (
+                      <option key={option.name} value={option.id}>
+                        {option.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </p>
+            </div>
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>عام التسجيل</span>
+                <select value={year} onChange={handleYearChange} className="form-select">
+                  {years.map((option) => {
+                    return (
+                      <option key={option.name} value={option.id}>
+                        {option.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </p>
+            </div>
+            <div className="col-sm-12 col-md-6">
+              <p>
+                <span>فصل التسجيل</span>
+                <select value={term} onChange={handleTermChange} className="form-select">
+                  {terms.map((option) => {
+                    return (
+                      <option key={option.name} value={option.id}>
+                        {option.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </p>
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <button className="btn btn-primary" onClick={() => addNewStudent()}>
+          حفظ
+        </button>
+        <a style={{ marginRight: "20px" }} href="/dashboard/students">
+          عودة
+        </a>
+      </div>
+    </Container>
+  );
 }
 
 export default EditStudent

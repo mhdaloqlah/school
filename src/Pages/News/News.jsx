@@ -3,9 +3,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import axios from "axios";
 import { Dialog } from "primereact/dialog";
-import Viewstudent from "./_viewStudent";
-import AddStudent from "./_addStudent";
-import EditStudent from "./_editStudent";
+
 import { ConfirmDialog } from "primereact/confirmdialog";
 import { confirmDialog } from "primereact/confirmdialog";
 import PropTypes from "prop-types";
@@ -23,21 +21,21 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate } from 'react-router-dom';
 
-function Students() {
+function News() {
   const apilink = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
-  const Api = apilink + "student?include=grade,subclass";
-  const [students, setStudents] = useState([]);
+  const Api = apilink+"news";
+  const [news, setNews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const goToEditStudent = (id) => { navigate(`/dashboard/editstudent/${id}`); };
+  const goToEditNews = (id) => { navigate(`/dashboard/EditNews/${id}`); };
 
-  const getStudents = () => {
+  const getNews = () => {
     axios
       .get(Api)
       .then((res) => {
-        setStudents(res.data.data);
+        setNews(res.data.data);
         console.log(res.data.data);
       })
       .catch((err) => {
@@ -46,21 +44,21 @@ function Students() {
   };
 
   useEffect(() => {
-    getStudents();
+    getNews();
   }, []);
 
   const handelDelete = async (id) => {
     console.log("id : -", id);
     // setIsLoading(true);
     try {
-      const response = await fetch(apilink.concat("student/") + id, {
+      const response = await fetch(apilink.concat("news/") + id, {
         method: "DELETE",
       });
       if (!response.ok) {
         throw new Error("Failed to delete item");
       }
-      setStudents(students.filter((item) => item.id !== id));
-      // getYears();
+      setNews(news.filter((item) => item.id !== id));
+      
     } catch (error) {
       setError(error.message);
     } finally {
@@ -69,49 +67,48 @@ function Students() {
   };
 
   const handleShow = (id) => {
-    navigate(`/dashboard/AdminStudentMark/${id}`);
+    getStudent(id);
   };
 
   return (
     <Container style={{ paddingRight: "50px" }}>
-      <h1 style={{ marginTop: "25px" }}>سجل الطلاب</h1>
+      <h1 style={{ marginTop: "25px" }}>سجل الأخبار</h1>
       <Row style={{ marginTop: "50px" }}>
         <Col xl={1}>
-          <a href="/dashboard/AddStudent" className="btn btn-primary" variant="contained">إضافة</a>
+          <a href="/dashboard/AddNews" className="btn btn-primary" variant="contained">إضافة</a>
         </Col>
       </Row>
 
       <Row>
         <div className="mt-5">
           {isLoading && <Loader />}
-
           {error && <p>Error: {error}</p>}
-
 
           <table className="table table-striped">
             <thead>
               <tr>
-                <th>رقم الطالب</th>
-                <th>اسم الطالب</th>
-                <th>الشعبة</th>
-                <th>الصف</th>
+                <th>رقم الخبر</th>
+                <th>عنوان الخبر</th>
+                <th>تاريخ الخبر</th>
+                <th>تصنيف الخبر</th>
+
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {students?.map((item, i) => {
+              {news?.map((item, i) => {
                 return (
                   <tr key={i + 1}>
                     <td>{i + 1}</td>
-                    <td style={{ color: 'red' }}>
-                      {item.first_name} {item.last_name}
+                    <td>
+                      {item.title}
                     </td>
-                    <td>{item.subclass.name}</td>
-                    <td>{item.grade.name}</td>
+                    <td>{item.news_date}</td>
+                    <td>{item.news_for}</td>
                     <td>
                       <Button
-                        onClick={() => goToEditStudent(item.id)}
-                        style={{ backgroundColor: "green" }}
+                        onClick={() => goToEditNews(item.id)}
+                        style={{ backgroundColor: "green", marginLeft:'20px' }}
                         variant="contained"
                       >
                         {" "}
@@ -119,19 +116,7 @@ function Students() {
                         تعديل
                       </Button>
 
-                      <Button
-                        onClick={() => handleShow(item.id)}
-                        style={{
-                          backgroundColor: "orange",
-                          marginRight: "10px",
-                          marginLeft: "10px",
-                        }}
-                        variant="contained"
-                      >
-                        {" "}
-                        <VisibilityIcon style={{ cursor: "pointer" }} />
-                        درجات
-                      </Button>
+                   
                       <Button
                         onClick={() => handelDelete(item.id)}
                         style={{ backgroundColor: "red" }}
@@ -145,12 +130,6 @@ function Students() {
                   </tr>
                 );
               })}
-
-              <tr>
-                <td colSpan="5" style={{ color: 'red' }}>
-                  عند حذف سجل الطالب سيتم حذف جميع درجات الطالب المدخلة
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -159,4 +138,4 @@ function Students() {
   );
 }
 
-export default Students;
+export default News;

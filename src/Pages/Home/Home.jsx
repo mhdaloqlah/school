@@ -12,7 +12,8 @@ import axios from 'axios';
 
 function Home() {
 
-  
+  const apilink =import.meta.env.VITE_API_BASE_URL;
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -24,7 +25,7 @@ function Home() {
     e.preventDefault();
     
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login', {
+      const response = await axios.post( apilink+'login', {
         username,
         password,
       });
@@ -32,8 +33,29 @@ function Home() {
       localStorage.setItem('token', response.data.access_token);
       localStorage.setItem('username', response.data.data.username);
       localStorage.setItem('user_id', response.data.data.id);
-      localStorage.setItem('type', response.data.user_type);
-      navigate('/dashboard');
+      localStorage.setItem('usertype', response.data.user_type);
+      localStorage.setItem('user_image', response.data.user_image);
+      localStorage.setItem('user_first_name', response.data.first_name);
+      localStorage.setItem('object_id', response.data.object_id);
+      if(response.data.user_type=='admin'){
+        localStorage.setItem('user_first_name', response.data.data.username);
+              navigate('/dashboard/admin');
+
+      }
+
+      if(response.data.user_type=='teacher'){
+        localStorage.setItem('user_first_name', response.data.data.username);
+              navigate('/dashboard/EditProfileTeacher');
+
+      }
+
+      if(response.data.user_type=='student'){
+        localStorage.setItem('user_first_name', response.data.data.username);
+              navigate('/dashboard/EditProfile');
+
+      }
+
+      // navigate('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
       alert('login failed');
@@ -55,7 +77,7 @@ function Home() {
             <TextField
               required
               id="outlined-required"
-              label="اسم المستخدم"
+              label="Username"
               value={username}
               sx={{ width: '400px', direction: 'ltr' }}
               onChange={(e) => setUsername(e.target.value)}
@@ -64,7 +86,7 @@ function Home() {
           <Box component="section" sx={{ p: 2, }}>
             <TextField
               id="outlined-password-input"
-              label="كلمة المرور"
+              label="Password"
               type="password"
               autoComplete="current-password"
               sx={{ width: '400px', direction: 'ltr' }}
@@ -74,7 +96,7 @@ function Home() {
           </Box>
           <Box component="section" sx={{ p: 2 }}>
             <Button onClick={handleSubmit} variant="contained">دخول</Button>
-            <Link href="/About" sx={{ paddingRight: '50px' }}>نسيت كلمة المرور</Link>
+            
           </Box>
 
 
